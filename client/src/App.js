@@ -7,7 +7,8 @@ import TableBody from '@material-ui/core/TableBody';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import { withStyles } from '@material-ui/core';
-import { useEffect,useState } from 'react';
+import { useEffect,useState,useRef } from 'react';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 const styles=(theme)=>({
   root:{
@@ -17,6 +18,9 @@ const styles=(theme)=>({
   },
   table:{
     minWidth:1080
+  },
+  progress:{
+    margin:theme.spacing.unit*2
   }
 })
 
@@ -24,14 +28,26 @@ const serverURL="http://localhost:5000/api/customers";
 
 function App(props) {
       const [customerData,setCustomerData]=useState(null);
-      
+      const [completed,setCompleted]=useState(0);
+      const [isLoad,setIsLoad]=useState(false);
+
       useEffect(()=>{
-        fetch(serverURL)
-        .then(res=>res.json())
+        const timer=setInterval(()=>{
+          setCompleted((completed)=>completed>=100?0:completed+1);
+          {if(isLoad){clearInterval(timer);}}
+        },20);
+
+        callApi()
         .then(data=>setCustomerData(data))
         .catch(err=>console.log(err));
-      },[])
+      },[isLoad]);
 
+      const callApi=async()=>{
+        const response=await fetch(serverURL);
+        const body=await response.json();
+        setIsLoad(true);
+        return body;
+      }
       const {classes}=props;
       return (
         <Paper className={classes.root}>
@@ -47,9 +63,15 @@ function App(props) {
               </TableRow>
             </TableHead>
             <TableBody>
-                {(customerData)===null ? "" :(
-                  customerData.map((customer)=>{
-                    return(
+                {(customerData)===null ? 
+                  <TableRow>
+                    <TableCell colspan="6" align="center">
+                      <CircularProgress className={classes.progress} variant="indeterminate" value={completed}/>
+                    </TableCell>
+                  </TableRow> 
+                  :(
+                    customerData.map((customer)=>{
+                      return(
                         <Customer
                             key={customer.id}
                             id={customer.id}
