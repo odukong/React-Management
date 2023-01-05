@@ -73,17 +73,17 @@ function App(props) {
                     customerData.map((customer)=>{
                       return(
                         <Customer
-                            key={customer.id}
-                            id={customer.id}
-                            image={customer.image}
-                            name={customer.name}
-                            birthday={customer.birthday}
-                            gender={customer.gender}
-                            job={customer.job}/>
+                            key={customer.ID}
+                            id={customer.ID}
+                            image={customer.IMAGE}
+                            name={customer.NAME}
+                            birthday={customer.BIRTHDAY}
+                            gender={customer.GENDER}
+                            job={customer.JOB}/>
+                        
                     )
                   })
                 )}
-                
             </TableBody>
           </Table>
         </Paper>

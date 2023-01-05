@@ -10,7 +10,8 @@
         "body-parser": "^1.18.3",
         "cors": "^2.8.5",
         "express": "^4.16.4",
-        "nodemon": "^2.0.20"
+        "nodemon": "^2.0.20",
+        "oracledb": "^5.5.0"
     },
     "devDependencies": {
         "concurrently": "^4.0.1"
