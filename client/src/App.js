@@ -9,46 +9,57 @@ import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import { withStyles } from '@material-ui/core';
 import { useEffect,useState } from 'react';
-import CircularProgress from '@material-ui/core/CircularProgress';
+import CircularisLoad from '@material-ui/core/CircularProgress';
 
 const styles=(theme)=>({
   root:{
     width:'100%',
-    marginTop:theme.spacing.unit*3,
+    marginTop:theme.spacing(3),
     overflow:"auto"
   },
   table:{
     minWidth:1080
   },
-  progress:{
-    margin:theme.spacing.unit*2
+  isLoad:{
+    margin:theme.spacing(2)
   }
 })
 
 const serverURL="http://localhost:5000/api/customers";
 
 function App(props) {
-      const [customerData,setCustomerData]=useState(null);
-      const [completed,setCompleted]=useState(0);
-      const [isLoad,setIsLoad]=useState(false);
+      const [customerData,setCustomerData]=useState([]);
+      //const [completed,setCompleted]=useState(0);
+      const [isLoad,setIsLoad]=useState(0);
+
+      const callApi=()=>{
+        fetch(serverURL)
+          .then((res)=>res.json())
+          .then((body)=>{
+            setCustomerData(body);
+          })
+      }
+      useEffect(()=>{
+        callApi()
+      },[]);
+
+      const stateRefresh=()=>{
+        setCustomerData([])
+        fetch(serverURL)
+          .then((res)=>res.json())
+          .then((body)=>{
+            setCustomerData(body)
+          })
+      }
 
       useEffect(()=>{
         const timer=setInterval(()=>{
-          setCompleted((completed)=>completed>=100?0:completed+1);
-          if(isLoad){clearInterval(timer);}
-        },20);
-
-        callApi()
-        .then(data=>setCustomerData(data))
-        .catch(err=>console.log(err));
-      },[isLoad]);
-
-      const callApi=async()=>{
-        const response=await fetch(serverURL);
-        const body=await response.json();
-        setIsLoad(true);
-        return body;
-      }
+          setIsLoad(isLoad=>isLoad>=100?0:isLoad+1);
+        },200)
+        return ()=>{
+          clearInterval(timer);
+        }
+      },[])
 
       const {classes}=props;
       return (
@@ -68,14 +79,15 @@ function App(props) {
               <TableBody>
                   {(customerData)===null ? 
                     <TableRow>
-                      <TableCell colspan="6" align="center">
-                        <CircularProgress className={classes.progress} variant="indeterminate" value={completed}/>
+                      <TableCell colSpan="6" align="center">
+                        <CircularisLoad className={isLoad} variant="determinate" value={isLoad}/>
                       </TableCell>
                     </TableRow> 
                     :(
                       customerData.map((customer)=>{
                         return(
                           <Customer
+                              stateRefresh={stateRefresh}
                               key={customer.ID}
                               id={customer.ID}
                               image={customer.IMAGE}
@@ -89,7 +101,7 @@ function App(props) {
               </TableBody>
             </Table>
           </Paper>
-          <CustomerAdd/>
+          <CustomerAdd stateRefresh={stateRefresh}/>
         </div>
       );
 }

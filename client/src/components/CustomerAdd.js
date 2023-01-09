@@ -1,5 +1,5 @@
 import React,{useState} from "react";
-import post from "axios";
+import Axios from "axios";
 
 function CustomerAdd(props){
     const [file,setFile]=useState(null);
@@ -9,14 +9,41 @@ function CustomerAdd(props){
     const [job,setJob]=useState('');
     const [fileName,setFileName]=useState('');
     
+    const handleFile=(e)=>{
+        setFile(e.target.files[0]);
+        setFileName(e.target.value);
+    }
+    const handleName=(e)=>{
+        e.preventDefault();
+        setUserName(e.target.value);
+    }
+    const handleBirthday=(e)=>{
+        e.preventDefault();
+        setBirthday(e.target.value);
+    }
+    const handleGender=(e)=>{
+        e.preventDefault();
+        setGender(e.target.value);
+    }
+    const handleJob=(e)=>{
+        e.preventDefault();
+        setJob(e.target.value);
+    }
+
     const handleFormSubmit=(event)=>{
-        event.preventDefaut();
+        event.preventDefault();
         addCustomer()
-            .then((res)=>{console.log(res.data)});
+            .then((res)=>{
+                console.log(res);
+                props.stateRefresh();
+            });
+        setFile(null);setUserName('');setBirthday('');
+        setGender('');setJob('');setFileName('');
+        //window.location.reload();
     }
 
     const addCustomer=()=>{
-        const url="/api/customers";
+        const url="http://localhost:5000/api/customers";
         const formData=new FormData();
         formData.append('image',file);
         formData.append('name',userName);
@@ -25,33 +52,22 @@ function CustomerAdd(props){
         formData.append('job',job);
         const config={
             headers:{
-                'content-type':'multipart/form-data'
+                'Content-Type':'multipart/form-data'
             }
         }
-        return post(url,formData,config);
+        return Axios.post(url,formData,config);
     }
     
-    const handleFileChange=(e)=>{
-        setFile(e.target.files[0]);
-        setFileName(e.target.value.fileName);
-    }
-
-    const handleValueChange=(e)=>{
-        setUserName(e.target.value.userName);
-        setBirthday(e.target.value.birthday);
-        setGender(e.target.value.gender);
-        setJob(e.target.value.job);
-    }
     return(
         <form onSubmit={handleFormSubmit}>
-            <h1>고객추가</h1>
-            프로필 이미지: <input type="file" name="file" file={file} value={fileName} onChange={handleFileChange}/><br/>
-            이름: <input type="text" name="username" value={userName} onChange={handleValueChange}/><br/>
-            생년월일: <input type="text" name="birthday" value={birthday} onChange={handleValueChange}/><br/>
-            성별: <input type="text" name="gender" value={gender} onChange={handleValueChange}/><br/>
-            직업: <input type="text" name="job" value={job} onChange={handleValueChange}/><br/>
-            <button type="submit">추가하기</button>
-        </form> 
+                <h1>고객추가</h1>
+                프로필 이미지: <input type="file" name="file" file={file} value={fileName} onChange={handleFile}/><br/>
+                이름: <input type="text" name="userName" value={userName} onChange={handleName}/><br/>
+                생년월일: <input type="text" name="birthday" value={birthday} onChange={handleBirthday}/><br/>
+                성별: <input type="text" name="gender" value={gender} onChange={handleGender}/><br/>
+                직업: <input type="text" name="job" value={job} onChange={handleJob}/><br/>
+                <button type="submit">추가하기</button>
+        </form>
     );
 }
 
