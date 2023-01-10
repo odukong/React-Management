@@ -74,27 +74,28 @@ function App(props) {
                   <TableCell>생년월일</TableCell>
                   <TableCell>성별</TableCell>
                   <TableCell>직업</TableCell>
+                  <TableCell>설정</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                   {(customerData)===null ? 
                     <TableRow>
-                      <TableCell colSpan="6" align="center">
+                      <TableCell colSpan="7" align="center">
                         <CircularisLoad className={isLoad} variant="determinate" value={isLoad}/>
                       </TableCell>
                     </TableRow> 
                     :(
                       customerData.map((customer)=>{
                         return(
-                          <Customer
-                              stateRefresh={stateRefresh}
-                              key={customer.ID}
-                              id={customer.ID}
-                              image={customer.IMAGE}
-                              name={customer.NAME}
-                              birthday={customer.BIRTHDAY}
-                              gender={customer.GENDER}
-                              job={customer.JOB}/>
+                            <Customer
+                                stateRefresh={stateRefresh}
+                                key={customer.ID}
+                                id={customer.ID}
+                                image={customer.IMAGE}
+                                name={customer.NAME}
+                                birthday={customer.BIRTHDAY}
+                                gender={customer.GENDER}
+                                job={customer.JOB}/>
                       )
                     })
                   )}

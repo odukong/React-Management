@@ -5,9 +5,15 @@ const cors=require('cors');
 const port = process.env.PORT||5000;
 const mysql=require('mysql');
 
+const multer=require('multer');
+const upload=multer({dest:'./upload'}); //path of file submitted
+
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended:true}));
+
+app.use('/image',express.static('./upload')); //user는 image경로, server는 upload경로로 접근
+
 
 const connection=mysql.createConnection({
     user:'root',
@@ -24,11 +30,8 @@ connection.connect((err)=>{
     console.log('접속성공');
 });
 
-const multer=require('multer');
-const upload=multer({dest:'./upload'});
-
 app.get('/api/customers',(req,res)=>{
-    let query='select *'+' from customer';
+    let query='select *'+' from customer WHERE isDeleted=0';
         connection.query(query,[],
             function(err,rows,fields){
                 if(err) {console.log("조회실패");return;};
@@ -38,11 +41,9 @@ app.get('/api/customers',(req,res)=>{
         )
 })
 
-app.use('/image',express.static('./upload'));
-
 app.post('/api/customers',upload.single('image'),(req,res)=>{
-    let sql="INSERT INTO customer VALUES (null,?,?,?,?,?)";
-    let image='/image'+req.file.filename;
+    let sql="INSERT INTO customer VALUES (null,?,?,?,?,?,now(),0)";
+    let image='/image/'+req.file.filename;
     let name=req.body.name;
     let birthday=req.body.birthday;
     let gender=req.body.gender;
@@ -56,4 +57,12 @@ app.post('/api/customers',upload.single('image'),(req,res)=>{
     })
 });
 
+app.delete('/api/customers/:id',(req,res)=>{
+    let sql='UPDATE customer SET isDeleted=1 WHERE ID=?';
+    let params=[req.params.id];
+    console.log(params);
+    connection.query(sql,params,(err,rows,fields)=>{
+        res.send(rows);
+    })
+})
 app.listen(port,()=>{console.log(`Listening on port ${port}`)});
