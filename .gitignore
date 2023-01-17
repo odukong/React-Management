@@ -3,6 +3,9 @@
 #upload
 /upload
 
+#none-upload 
+./client/src/Test
+
 #database
 /database.json
 
