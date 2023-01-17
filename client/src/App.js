@@ -37,6 +37,7 @@ function App(props) {
           .then((res)=>res.json())
           .then((body)=>{
             setCustomerData(body);
+            console.log(body);
           })
       }
       useEffect(()=>{

@@ -1,5 +1,19 @@
 import React,{useState} from "react";
 import Axios from "axios";
+import Dialog from "@material-ui/core/Dialog";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import DialogContent from "@material-ui/core/DialogContent";
+import TextField from "@material-ui/core/TextField";
+import Button from "@material-ui/core/Button";
+import {withStyles} from "@material-ui/core/styles";
+
+
+const styles=theme=>({
+    hidden:{
+        display:'none'
+    }
+})
 
 function CustomerAdd(props){
     const [file,setFile]=useState(null);
@@ -8,7 +22,8 @@ function CustomerAdd(props){
     const [gender,setGender]=useState('');
     const [job,setJob]=useState('');
     const [fileName,setFileName]=useState('');
-    
+    const [open,setOpen]=useState(false);
+
     const handleFile=(e)=>{
         setFile(e.target.files[0]);
         setFileName(e.target.value);
@@ -39,6 +54,7 @@ function CustomerAdd(props){
             });
         setFile(null);setUserName('');setBirthday('');
         setGender('');setJob('');setFileName('');
+        setOpen(false);
         //window.location.reload();
     }
 
@@ -58,17 +74,45 @@ function CustomerAdd(props){
         return Axios.post(url,formData,config);
     }
     
+    const handleClickOpen=()=>{
+        setOpen(true);
+    }
+    const handleClickClose=()=>{
+        setFile(null);setUserName('');setBirthday('');
+        setGender('');setJob('');setFileName('');
+        setOpen(false);
+    }
+    const {classes}=props;
     return(
-        <form onSubmit={handleFormSubmit}>
-                <h1>고객추가</h1>
-                프로필 이미지: <input type="file" name="file" file={file} value={fileName} onChange={handleFile}/><br/>
-                이름: <input type="text" name="userName" value={userName} onChange={handleName}/><br/>
-                생년월일: <input type="text" name="birthday" value={birthday} onChange={handleBirthday}/><br/>
-                성별: <input type="text" name="gender" value={gender} onChange={handleGender}/><br/>
-                직업: <input type="text" name="job" value={job} onChange={handleJob}/><br/>
-                <button type="submit">추가하기</button>
-        </form>
+        <div>
+            <Button variant="contained" color="primary" onClick={handleClickOpen}>
+                고객 추가하기
+            </Button>
+            <Dialog open={open} onClose={handleClickClose}>
+                <DialogTitle>고객 추가</DialogTitle>
+                <DialogContent>
+                    <input className={classes.hidden} accept="image/*" id="raised-button-file" type="file" file={file} value={fileName} onChange={handleFile}/><br/>
+                    <label htmlFor="raised-button-file">
+                        <Button variant="contained" color="primary" component="span" name="file">
+                            {fileName===""? "프로필 이미지 선택":fileName}
+                        </Button>
+                    </label><br/>
+                    <TextField label="이름" type="text" name="userName" value={userName} onChange={handleName}/><br/>
+                    <TextField label="생년월일" type="text" name="birthday" value={birthday} onChange={handleBirthday}/><br/>
+                    <TextField label="성별" type="text" name="gender" value={gender} onChange={handleGender}/><br/>
+                    <TextField label="직업" type="text" name="job" value={job} onChange={handleJob}/><br/>
+                </DialogContent>
+                <DialogActions>
+                    <Button variant="contained" color="primary" onClick={handleFormSubmit}>
+                        추가
+                    </Button>
+                    <Button variant="outlined" color="primary" onClick={handleClickClose}>
+                        닫기
+                    </Button>
+                </DialogActions>
+            </Dialog>
+        </div>
     );
 }
 
-export default CustomerAdd;
+export default withStyles(styles)(CustomerAdd);
