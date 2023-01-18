@@ -93,6 +93,7 @@ function App(props) {
       const [customerData,setCustomerData]=useState([]);
       //const [completed,setCompleted]=useState(0);
       const [isLoad,setIsLoad]=useState(0);
+      const [searchKeyword,setSearchKeyword]=useState('');
 
       const callApi=()=>{
         fetch(serverURL)
@@ -107,7 +108,9 @@ function App(props) {
       },[]);
 
       const stateRefresh=()=>{
-        setCustomerData([])
+        setCustomerData([]);
+        setIsLoad(0);
+        setSearchKeyword("");
         fetch(serverURL)
           .then((res)=>res.json())
           .then((body)=>{
@@ -124,6 +127,23 @@ function App(props) {
         }
       },[])
 
+      const handleValueChange=(e)=>{
+        setSearchKeyword(e.target.value);
+      }
+
+      const filterComponent=(data)=>{
+        data=data.filter((c)=>{
+          if(searchKeyword===""){return c}
+          else if(c.NAME.includes(searchKeyword)){return c}
+        });
+        return(
+          data.map((c)=>{
+            return(
+              <Customer stateRefresh={stateRefresh} key={c.ID} id={c.ID} image={c.IMAGE}
+                  name={c.NAME} birthday={c.BIRTHDAY} gender={c.GENDER} job={c.JOB}/>
+            )
+        }));
+      }
       const {classes}=props;
       const cellList=["번호","이미지","이름","생년월일","성별","직업","설정"];
       return (
@@ -155,6 +175,9 @@ function App(props) {
                   <StyledInputBase
                     placeholder="검색하기"
                     inputProps={{ 'aria-label': 'search' }}
+                    name="searchKeyword"
+                    onChange={(e)=>handleValueChange(e)}
+                    value={searchKeyword}
                   />
                 </Search>
               </Toolbar>
@@ -184,19 +207,7 @@ function App(props) {
                       </TableCell>
                     </TableRow> 
                     :(
-                      customerData.map((customer)=>{
-                        return(
-                            <Customer
-                                stateRefresh={stateRefresh}
-                                key={customer.ID}
-                                id={customer.ID}
-                                image={customer.IMAGE}
-                                name={customer.NAME}
-                                birthday={customer.BIRTHDAY}
-                                gender={customer.GENDER}
-                                job={customer.JOB}/>
-                      )
-                    })
+                      filterComponent(customerData)
                   )}
               </TableBody>
             </Table>
