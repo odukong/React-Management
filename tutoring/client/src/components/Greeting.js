@@ -3,7 +3,7 @@ import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import {Link,Outlet} from "react-router-dom";
+import {Link,Outlet,useNavigate} from "react-router-dom";
 //import Link from '@mui/material/Link';
 import Grid from "@mui/material/Grid";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
@@ -17,18 +17,23 @@ function Greeting(){
     const [passwd,setPasswd]=useState("");
     const [isMatched,setIsMatched]=useState(true);
 
+    const navigater=useNavigate();
+
     const handleSubmit=(e)=>{
         e.preventDefault();
         checkUser()
-        .then((res)=>console.log(res))
         .then((res)=>{
-            if(res==="success"){
+            console.log(res.data);
+            return res.data;})
+        .then((res)=>{
+            if(res){
                 setIsMatched(true);
                 //로그인 성공시 이동
                 console.log("=========로그인 성공")
-                document.location.href="/home";
+                navigater('/home/'+id);
             }else{
                 setIsMatched(false);
+                console.log("=========로그인 실패");
             }
         })
         

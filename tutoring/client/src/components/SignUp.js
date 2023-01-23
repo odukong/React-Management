@@ -3,7 +3,7 @@ import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-//import {Link,Outlet} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import Grid from "@mui/material/Grid";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Container from '@mui/material/Container';
@@ -18,33 +18,46 @@ function SignUp(){
     const [IsId,setIsId]=useState(false);
     const [IsPasswd,setIsPasswd]=useState(false);
 
+    const navigater=useNavigate();
+
     const handleJoin=(e)=>{
         e.preventDefault();
         //체크할 함수들
         checkEmail();checkId();checkPw();
+        console.log(`${IsEmail},${IsId},${IsPasswd}`)
         if(IsEmail&&IsId&&IsPasswd){
             //정상적으로 회원가입되었을 때
-            sendBackend();
+            console.log("정상으로 들어옴");
+            sendBackend()
+            .then((res)=>{
+                console.log("서버에 저장된 데이터 : "+res.data)
+            })
+            .catch((err)=>console.log(err));
             setName('');setEmail('');setId('');setPasswd('');
-            window.location.href='/';    
+            navigater('/');   
         }else{
             //회원가입 실패했을 때  
+            console.log("회원가입에 실패함")
             setName('');setEmail('');setId('');setPasswd('');  
         }
     }
     
     const sendBackend=()=>{
-            Axios.post('/join',{
-                name:{name},
-                email:{email},
-                id:{id},
-                passwd:{passwd}
+            const formData=new FormData();
+            formData.append('name',name);
+            formData.append('email',email);
+            formData.append('id',id);
+            formData.append('passwd',passwd);
+            const config={
+                headers:{
+                    'Content-Type':`application/json`
+                }
+            }
+            return Axios.post('http://localhost:5000/join',formData,config)
+            /*.then((res)=>{
+                console.log("서버에 저장된 데이터 : "+res)
             })
-            .then((res)=>{
-                console.log(`서버에서 받아온 입력 데이터 ${res}`);
-                console.log(res.data);
-            })
-            .catch((err)=>console.log(err));    
+            .catch((err)=>console.log(err));*/  
     }
 
     const checkEmail=()=>{
@@ -72,9 +85,9 @@ function SignUp(){
                 id:`${id}`
             }
             Axios.post("http://localhost:5000/check",data,config)
-            .then(res=>console.log(res))
-            .then(json=>{
-                if(json.tf===true){
+            .then(res=>{console.log(res.data);return res.data;})
+            .then(res=>{
+                if(res){
                     console.log("올바른 아이디 형식, 사용가능한 아이디")
                     setIsId(true)        
                 }else{
