@@ -40,7 +40,6 @@ app.post('/check',(req,res)=>{
     })
 })
 app.post('/join',(req,res)=>{
-    console.log('서버에 들어오긴 함?')
     console.log(req.body);
     var data=[req.body.id,req.body.passwd,req.body.name,req.body.email];
     console.log("서버에서 회원가입할 데이터를 받았습니다");

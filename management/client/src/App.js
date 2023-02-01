@@ -1,6 +1,6 @@
 import './App.css';
 import './index.css'
-import Customer from './components/Customer';
+import Customer from './components/Customer.js';
 import CustomerAdd from "./components/CustomerAdd";
 import Paper from "@material-ui/core/Paper";
 import Table from '@material-ui/core/Table';
